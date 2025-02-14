@@ -23,6 +23,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install build twine
 
+      - name: Clean previous builds
+        run: rm -rf dist/
+
       - name: Build package
         run: python -m build
 
@@ -30,5 +33,4 @@ jobs:
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: python -m twine upload dist/*
-
+        run: python -m twine upload --skip-existing --repository pypi dist/*
