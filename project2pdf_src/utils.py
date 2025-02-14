@@ -1,18 +1,25 @@
 import os
 import platform
 import subprocess
+import sys
 
 def ensure_tree_installed():
     """
     Checks if 'tree' is installed. If not, attempts to install it automatically
     on Linux (including Google Colab), macOS, or Windows. Falls back if installation fails.
     """
+    # 1. If already installed, we're done
     if is_tree_available():
         return True
 
+    # 2. If in Google Colab (or general Linux with root), install via apt-get
+    if "google.colab" in sys.modules:
+        return install_tree_colab()
+
+    # 3. Otherwise, check OS and install accordingly
     os_system = platform.system()
     if os_system == "Linux":
-        return install_tree_linux_colab()
+        return install_tree_linux()
     elif os_system == "Darwin":  # macOS
         return install_tree_macos()
     elif os_system == "Windows":
@@ -29,16 +36,40 @@ def is_tree_available():
     except (FileNotFoundError, subprocess.CalledProcessError):
         return False
 
-def install_tree_linux_colab():
+def install_tree_colab():
     """
-    Attempts to install 'tree' on Linux without 'sudo'.
-    This works on Google Colab (Ubuntu-based) or Debian-based systems with root access.
+    Installs 'tree' on Google Colab (Ubuntu-based) or other Debian-based Linux with root privileges.
     """
     try:
-        print("🔧 Installing 'tree' on Linux (compatible with Google Colab)...")
+        print("✔ Detected Google Colab (or similar). Installing 'tree' via apt-get...")
         subprocess.run(["apt-get", "update"], check=True)
         subprocess.run(["apt-get", "install", "-y", "tree"], check=True)
         return True
+    except Exception as e:
+        print(f"⚠️ Failed to install 'tree' on Colab/Linux: {e}. Using fallback method.")
+        return False
+
+def install_tree_linux():
+    """
+    Attempts to install 'tree' on Linux using apt-get, yum, or dnf.
+    """
+    try:
+        if which("apt-get"):
+            print("🔧 Installing 'tree' on Linux (apt-get)...")
+            subprocess.run(["sudo", "apt-get", "update"], check=True)
+            subprocess.run(["sudo", "apt-get", "install", "-y", "tree"], check=True)
+            return True
+        elif which("yum"):
+            print("🔧 Installing 'tree' on Linux (yum)...")
+            subprocess.run(["sudo", "yum", "install", "-y", "tree"], check=True)
+            return True
+        elif which("dnf"):
+            print("🔧 Installing 'tree' on Linux (dnf)...")
+            subprocess.run(["sudo", "dnf", "install", "-y", "tree"], check=True)
+            return True
+        else:
+            print("⚠️ No known package manager found (apt-get, yum, or dnf). Using fallback method.")
+            return False
     except Exception as e:
         print(f"⚠️ Failed to install 'tree' on Linux: {e}. Using fallback method.")
         return False
@@ -81,6 +112,7 @@ def get_project_structure(root_dir):
     Returns the directory structure using the 'tree' command if possible;
     otherwise, uses Python-based fallback.
     """
+    # Attempt installation & check if tree is now available
     if ensure_tree_installed() and is_tree_available():
         # 'tree' is available: run it
         try:
