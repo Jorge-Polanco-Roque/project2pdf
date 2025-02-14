@@ -6,13 +6,13 @@ import sys
 def ensure_tree_installed():
     """
     Checks if 'tree' is installed. If not, attempts to install it automatically
-    on Linux (including Google Colab), macOS, or Windows. Falls back if installation fails.
+    on Linux (including Google Colab & Enterprise), macOS, or Windows. Falls back if installation fails.
     """
     # 1. If already installed, we're done
     if is_tree_available():
         return True
 
-    # 2. If in Google Colab (or general Linux with root), install via apt-get
+    # 2. If in Google Colab or Colab Enterprise, install via apt-get
     if "google.colab" in sys.modules:
         return install_tree_colab()
 
@@ -38,10 +38,10 @@ def is_tree_available():
 
 def install_tree_colab():
     """
-    Installs 'tree' on Google Colab (Ubuntu-based) or other Debian-based Linux with root privileges.
+    Installs 'tree' on Google Colab (standard & enterprise) or other Debian-based Linux with root privileges.
     """
     try:
-        print("✔ Detected Google Colab (or similar). Installing 'tree' via apt-get...")
+        print("✔ Detected Google Colab. Installing 'tree' via apt-get...")
         subprocess.run(["apt-get", "update"], check=True)
         subprocess.run(["apt-get", "install", "-y", "tree"], check=True)
         return True
@@ -89,14 +89,18 @@ def install_tree_macos():
         return False
 
 def install_tree_windows():
-    """Attempts to install 'tree' on Windows using Chocolatey."""
+    """Attempts to install 'tree' on Windows using Chocolatey or Winget."""
     try:
         if which("choco"):
             print("🟦 Installing 'tree' on Windows using Chocolatey...")
             subprocess.run(["choco", "install", "-y", "tree"], check=True)
             return True
+        elif which("winget"):
+            print("🟦 Installing 'tree' on Windows using Winget...")
+            subprocess.run(["winget", "install", "--id", "gnuwin32.tree"], check=True)
+            return True
         else:
-            print("⚠️ Chocolatey is not installed. Using fallback method.")
+            print("⚠️ Chocolatey or Winget not found. Using fallback method.")
             return False
     except Exception as e:
         print(f"⚠️ Failed to install 'tree' on Windows: {e}. Using fallback method.")
