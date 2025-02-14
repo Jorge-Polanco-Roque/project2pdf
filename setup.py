@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="project2pdf",  # Nombre del paquete en PyPI
-    version="0.3.5",  # Versión inicial
+    version="0.3.6",  # Versión inicial
     packages=find_packages(),  # Busca automáticamente todos los paquetes
     install_requires=[
         "fpdf>=1.7.2",  # Dependencias necesarias

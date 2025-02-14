@@ -13,8 +13,8 @@ def ensure_tree_installed():
         return True
 
     # 2. If in Google Colab or Colab Enterprise, install via apt-get
-    if "google.colab" in sys.modules:
-        return install_tree_colab()
+    # if "google.colab" in sys.modules:
+    #     return install_tree_colab()
 
     # 3. Otherwise, check OS and install accordingly
     os_system = platform.system()
@@ -36,18 +36,18 @@ def is_tree_available():
     except (FileNotFoundError, subprocess.CalledProcessError):
         return False
 
-def install_tree_colab():
-    """
-    Installs 'tree' on Google Colab (standard & enterprise) or other Debian-based Linux with root privileges.
-    """
-    try:
-        print("✔ Detected Google Colab. Installing 'tree' via apt-get...")
-        subprocess.run(["apt-get", "update"], check=True)
-        subprocess.run(["apt-get", "install", "-y", "tree"], check=True)
-        return True
-    except Exception as e:
-        print(f"⚠️ Failed to install 'tree' on Colab/Linux: {e}. Using fallback method.")
-        return False
+# def install_tree_colab():
+#     """
+#     Installs 'tree' on Google Colab (standard & enterprise) or other Debian-based Linux with root privileges.
+#     """
+#     try:
+#         print("✔ Detected Google Colab. Installing 'tree' via apt-get...")
+#         subprocess.run(["apt-get", "update"], check=True)
+#         subprocess.run(["apt-get", "install", "-y", "tree"], check=True)
+#         return True
+#     except Exception as e:
+#         print(f"⚠️ Failed to install 'tree' on Colab/Linux: {e}. Using fallback method.")
+#         return False
 
 def install_tree_linux():
     """
