@@ -1,5 +1,5 @@
 import os
-from project2pdf.pdf_generator import ProjectPDFGenerator
+from project2pdf_src.pdf_generator import ProjectPDFGenerator
 
 def main():
     """Automatically detects projects in the root directory and generates PDFs without requiring parameters."""
